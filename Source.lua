@@ -136,6 +136,17 @@ function TimerClass:Stop()
 	RemoveFromArray(self)
 	EndTimer(self, self.State, time() - self.Started)
 end
+function TimerClass:Cancel()
+	RemoveFromArray(self)
+	EndTimer(self, self.State, time() - self.Started)
+	for _, Thread in next, self.YieldedThreads do
+		coroutine.resume(Thread, TimerEnum.Finished, time() - self.Started)
+	end
+end
+function TimerClass:Destroy()
+	table.clear(self)
+	self = nil
+end
 function TimerClass:IncrementTime(Delta)
 	self.Length += Delta
 end
@@ -144,7 +155,6 @@ end
 TimerClass.Yield = TimerClass.Wait
 TimerClass.Yield = TimerClass.Wait
 TimerClass.Play = TimerClass.Start
-TimerClass.Cancel = TimerClass.Stop
 TimerClass.Kill = TimerClass.Stop
 
 
